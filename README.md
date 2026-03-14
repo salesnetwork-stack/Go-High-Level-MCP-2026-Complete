@@ -8,7 +8,7 @@
 
 **Original Creator:** [@mastanley13](https://github.com/mastanley13) — Built the foundation for this MCP server.
 
-**Extended by:** [@BusyBee3333](https://github.com/BusyBee3333) — Expanded to 520+ tools covering the entire GHL API.
+**Extended by:** [@BusyBee3333](https://github.com/BusyBee3333) — Expanded to 563+ tools covering the entire GHL API.
 
 ---
 
@@ -194,7 +194,7 @@ mcporter call ghl-mcp search_contacts --params '{"query": "test"}'
 
 ---
 
-> **🔥 Transform Claude Desktop into a complete GoHighLevel CRM powerhouse with 520+ powerful tools across 40+ categories**
+> **🔥 Transform Claude Desktop into a complete GoHighLevel CRM powerhouse with 563+ powerful tools across 41+ categories**
 
 ## 🎯 What This Does
 
@@ -236,7 +236,7 @@ This comprehensive MCP (Model Context Protocol) server connects Claude Desktop d
 - ✅ Auto-deploy from GitHub
 - ✅ Built-in SSL
 
-## 🌟 Complete Tool Catalog (520+ Tools)
+## 🌟 Complete Tool Catalog (563+ Tools)
 
 ### 🎯 Contact Management (31 Tools)
 **Core Operations:**
@@ -315,8 +315,18 @@ This comprehensive MCP (Model Context Protocol) server connects Claude Desktop d
 **Templates & Settings:**
 - `get_location_templates`, `delete_location_template`, `get_timezones`
 
-### ✅ Email Verification (1 Tool)
+### ✅ Email ISV (9 Tools)
+**Verification:**
 - `verify_email` - Deliverability and risk assessment
+
+**Sending Domains:**
+- `ghl_list_email_domains`, `ghl_add_email_domain`, `ghl_delete_email_domain`
+- `ghl_verify_email_domain` - Trigger DNS verification (DKIM/SPF/DMARC)
+- `ghl_get_domain_dns_records` - Get required DNS records
+
+**Deliverability & Providers:**
+- `ghl_get_email_stats` - Bounce/spam/open/click rates
+- `ghl_list_email_providers`, `ghl_set_default_email_provider`
 
 ### 📱 Social Media Management (17 Tools)
 **Post Management:**
@@ -362,12 +372,19 @@ This comprehensive MCP (Model Context Protocol) server connects Claude Desktop d
 - `ghl_delete_custom_field`, `ghl_get_custom_fields_by_object_key`
 - `ghl_create_custom_field_folder`, `ghl_update_custom_field_folder`, `ghl_delete_custom_field_folder`
 
-### ⚡ Workflow Management (1 Tool)
-- `ghl_get_workflows` - Automation workflow discovery
+### ⚡ Workflow Management (8 Tools)
+- `ghl_get_workflows`, `ghl_list_workflows` - Workflow discovery & filtering
+- `ghl_get_workflow` - Full workflow details
+- `ghl_update_workflow_status` - Enable/disable workflows
+- `ghl_delete_workflow` - Delete a workflow
+- `ghl_trigger_workflow` - Manually enroll a contact into a workflow
+- `ghl_get_workflow_executions` - Execution history & status
 
-### 📊 Survey Management (2 Tools)
-- `ghl_get_surveys` - Survey management
-- `ghl_get_survey_submissions` - Response analysis
+### 📊 Survey Management (9 Tools)
+- `ghl_get_surveys`, `ghl_get_survey_submissions` - Existing survey tools
+- `ghl_create_survey`, `ghl_get_survey`, `ghl_update_survey`, `ghl_delete_survey` - Full CRUD
+- `ghl_list_survey_submissions`, `ghl_get_survey_submission` - Submission management
+- `ghl_get_survey_stats` - Analytics & completion rates
 
 ### 🛒 Store Management (18 Tools)
 **Shipping Zones:**
@@ -464,8 +481,41 @@ This comprehensive MCP (Model Context Protocol) server connects Claude Desktop d
 - `list_billing_charges`, `create_billing_charge`, `check_billing_funds`
 - `get_billing_charge`, `delete_billing_charge`
 
-### 📞 Phone System (2 Tools)
+### 📞 Phone System (15 Tools)
+**Existing:**
 - `list_number_pools`, `list_active_numbers_by_location`
+
+**Number Search & Purchase:**
+- `ghl_search_available_numbers` - Search numbers by area code, country, type & capabilities
+- `ghl_buy_phone_number` - Purchase a number to your location
+- `ghl_release_phone_number` - Release/remove a number
+
+**Number Management:**
+- `ghl_get_phone_number`, `ghl_list_phone_numbers` - View number details
+- `ghl_update_phone_number` - Update forwarding & messaging settings
+- `ghl_configure_call_forwarding` - Advanced forwarding rules
+
+**Call Records:**
+- `ghl_get_call_recording`, `ghl_list_call_recordings` - Access recordings
+- `ghl_get_voicemail` - Retrieve voicemail messages
+
+**BYOC (Bring Your Own Carrier):**
+- `ghl_get_byoc_trunk`, `ghl_create_byoc_trunk`, `ghl_list_byoc_trunks`
+
+### 🤖 Agent Studio (8 Tools) — NEW March 2026
+The brand-new GHL Agent Studio API for building and deploying AI agents programmatically.
+Required scope: `agent-studio_write`
+
+**Agent CRUD:**
+- `ghl_create_agent` - Create a new agent (auto-creates staging version)
+- `ghl_list_agents`, `ghl_get_agent` - Discover and inspect agents
+- `ghl_update_agent` - Update name, description, status
+- `ghl_delete_agent` - Permanently remove an agent
+
+**Version & Deployment:**
+- `ghl_list_agent_versions` - List all staging/production snapshots
+- `ghl_update_agent_version` - Build the agent graph (nodes, edges, variables, config)
+- `ghl_deploy_agent` - Deploy staging → production
 
 ### 🔧 Workflow Builder (7 Tools)
 - `ghl_create_workflow`, `ghl_list_workflows_full`, `ghl_get_workflow_full`
@@ -727,18 +777,20 @@ ghl-mcp-server/
 │   │   ├── calendar-tools.ts  # Appointments (14 tools)
 │   │   ├── email-tools.ts     # Email marketing (5 tools)
 │   │   ├── location-tools.ts  # Location management (24 tools)
-│   │   ├── email-isv-tools.ts # Email verification (1 tool)
+│   │   ├── email-isv-tools.ts # Email ISV / domains (9 tools)
 │   │   ├── social-media-tools.ts # Social media (17 tools)
 │   │   ├── media-tools.ts     # Media library (3 tools)
 │   │   ├── object-tools.ts    # Custom objects (9 tools)
 │   │   ├── association-tools.ts # Associations (10 tools)
 │   │   ├── custom-field-v2-tools.ts # Custom fields (8 tools)
-│   │   ├── workflow-tools.ts  # Workflows (1 tool)
-│   │   ├── survey-tools.ts    # Surveys (2 tools)
+│   │   ├── workflow-tools.ts  # Workflows (8 tools)
+│   │   ├── survey-tools.ts    # Surveys (9 tools)
 │   │   ├── store-tools.ts     # Store management (18 tools)
 │   │   ├── products-tools.ts  # Products (10 tools)
 │   │   ├── payments-tools.ts  # Payments (20 tools)
-│   │   └── invoices-tools.ts  # Invoices & billing (39 tools)
+│   │   ├── invoices-tools.ts  # Invoices & billing (39 tools)
+│   │   ├── phone-system-tools.ts # Phone system (15 tools)
+│   │   └── agent-studio-tools.ts # Agent Studio API (8 tools) — NEW
 │   ├── 📁 types/              # TypeScript definitions
 │   │   └── ghl-types.ts       # Comprehensive type definitions
 │   ├── 📁 utils/              # Utility functions
@@ -1004,7 +1056,7 @@ This project is licensed under the **ISC License** - see the [LICENSE](LICENSE) 
 
 This comprehensive MCP server delivers:
 
-### ✅ **520+ Operational Tools** across 40 categories
+### ✅ **520+ Operational Tools** across 41 categories
 ### ✅ **Real-time GoHighLevel Integration** with full API coverage
 ### ✅ **Production-Ready Deployment** on multiple platforms
 ### ✅ **Enterprise-Grade Architecture** with comprehensive error handling

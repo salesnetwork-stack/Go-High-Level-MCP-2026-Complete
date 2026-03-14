@@ -87,6 +87,225 @@ export class SurveyTools {
             complexity: "simple"
           }
         }
+      },
+
+      // ─── New Survey Tools ────────────────────────────────────────────────
+      {
+        name: 'ghl_create_survey',
+        description: 'Create a new survey for a location. Returns the created survey with its ID.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'The location ID to create the survey in. Uses default if not provided.'
+            },
+            name: {
+              type: 'string',
+              description: 'Display name for the survey'
+            },
+            fields: {
+              type: 'array',
+              description: 'Array of survey field/question objects',
+              items: {
+                type: 'object',
+                properties: {
+                  fieldKey: { type: 'string', description: 'Unique key for the field' },
+                  label: { type: 'string', description: 'Question text shown to respondents' },
+                  dataType: { type: 'string', description: 'Field type (e.g., TEXT, SINGLE_LINE, MULTI_LINE, DROPDOWN, RADIO, CHECKBOX)' },
+                  required: { type: 'boolean', description: 'Whether this field is required' },
+                  options: {
+                    type: 'array',
+                    items: { type: 'object' },
+                    description: 'Options for DROPDOWN/RADIO/CHECKBOX fields'
+                  }
+                }
+              }
+            },
+            thankYouMessage: {
+              type: 'string',
+              description: 'Message shown after submission'
+            }
+          },
+          required: ['name'],
+          additionalProperties: false
+        },
+        _meta: {
+          labels: { category: 'surveys', access: 'write', complexity: 'moderate' }
+        }
+      },
+      {
+        name: 'ghl_get_survey',
+        description: 'Get details for a specific survey by its ID.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID. Uses default if not provided.'
+            },
+            surveyId: {
+              type: 'string',
+              description: 'The unique ID of the survey to retrieve'
+            }
+          },
+          required: ['surveyId'],
+          additionalProperties: false
+        },
+        _meta: {
+          labels: { category: 'surveys', access: 'read', complexity: 'simple' }
+        }
+      },
+      {
+        name: 'ghl_update_survey',
+        description: 'Update survey configuration including name, fields, and thank-you message.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID. Uses default if not provided.'
+            },
+            surveyId: {
+              type: 'string',
+              description: 'The unique ID of the survey to update'
+            },
+            name: {
+              type: 'string',
+              description: 'New display name for the survey'
+            },
+            fields: {
+              type: 'array',
+              description: 'Updated array of survey field/question objects',
+              items: { type: 'object' }
+            },
+            thankYouMessage: {
+              type: 'string',
+              description: 'Updated message shown after submission'
+            }
+          },
+          required: ['surveyId'],
+          additionalProperties: false
+        },
+        _meta: {
+          labels: { category: 'surveys', access: 'write', complexity: 'moderate' }
+        }
+      },
+      {
+        name: 'ghl_delete_survey',
+        description: 'Permanently delete a survey and all its data. This action is irreversible.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID. Uses default if not provided.'
+            },
+            surveyId: {
+              type: 'string',
+              description: 'The unique ID of the survey to delete'
+            }
+          },
+          required: ['surveyId'],
+          additionalProperties: false
+        },
+        _meta: {
+          labels: { category: 'surveys', access: 'delete', complexity: 'simple' }
+        }
+      },
+      {
+        name: 'ghl_list_survey_submissions',
+        description: 'Get all submissions for a specific survey with filtering and pagination.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID. Uses default if not provided.'
+            },
+            surveyId: {
+              type: 'string',
+              description: 'The survey ID to get submissions for'
+            },
+            page: {
+              type: 'number',
+              description: 'Page number (default: 1)'
+            },
+            limit: {
+              type: 'number',
+              description: 'Submissions per page (max: 100, default: 20)'
+            },
+            startAt: {
+              type: 'string',
+              description: 'Start date filter (YYYY-MM-DD)'
+            },
+            endAt: {
+              type: 'string',
+              description: 'End date filter (YYYY-MM-DD)'
+            }
+          },
+          required: ['surveyId'],
+          additionalProperties: false
+        },
+        _meta: {
+          labels: { category: 'surveys', access: 'read', complexity: 'simple' }
+        }
+      },
+      {
+        name: 'ghl_get_survey_submission',
+        description: 'Get a single survey submission by its ID.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID. Uses default if not provided.'
+            },
+            surveyId: {
+              type: 'string',
+              description: 'The survey ID the submission belongs to'
+            },
+            submissionId: {
+              type: 'string',
+              description: 'The unique ID of the submission to retrieve'
+            }
+          },
+          required: ['surveyId', 'submissionId'],
+          additionalProperties: false
+        },
+        _meta: {
+          labels: { category: 'surveys', access: 'read', complexity: 'simple' }
+        }
+      },
+      {
+        name: 'ghl_get_survey_stats',
+        description: 'Get analytics and statistics for a survey including response counts, completion rate, and field-level breakdowns.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID. Uses default if not provided.'
+            },
+            surveyId: {
+              type: 'string',
+              description: 'The survey ID to get statistics for'
+            },
+            startDate: {
+              type: 'string',
+              description: 'Start of the reporting period (YYYY-MM-DD)'
+            },
+            endDate: {
+              type: 'string',
+              description: 'End of the reporting period (YYYY-MM-DD)'
+            }
+          },
+          required: ['surveyId'],
+          additionalProperties: false
+        },
+        _meta: {
+          labels: { category: 'surveys', access: 'read', complexity: 'simple' }
+        }
       }
     ];
   }
@@ -99,7 +318,29 @@ export class SurveyTools {
         
         case 'ghl_get_survey_submissions':
           return await this.getSurveySubmissions(params as MCPGetSurveySubmissionsParams);
-        
+
+        // ─── New Tools ──────────────────────────────────────────────────────
+        case 'ghl_create_survey':
+          return await this.createSurvey(params);
+
+        case 'ghl_get_survey':
+          return await this.getSurveyById(params);
+
+        case 'ghl_update_survey':
+          return await this.updateSurvey(params);
+
+        case 'ghl_delete_survey':
+          return await this.deleteSurvey(params);
+
+        case 'ghl_list_survey_submissions':
+          return await this.listSurveySubmissions(params);
+
+        case 'ghl_get_survey_submission':
+          return await this.getSurveySubmission(params);
+
+        case 'ghl_get_survey_stats':
+          return await this.getSurveyStats(params);
+
         default:
           throw new Error(`Unknown survey tool: ${name}`);
       }
@@ -194,13 +435,81 @@ export class SurveyTools {
       throw new Error(`Failed to get survey submissions: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
+
+  // ─── New Survey Handlers ─────────────────────────────────────────────────
+
+  private async createSurvey(params: any): Promise<any> {
+    const locationId = params.locationId || (this.apiClient as any).getConfig?.()?.locationId || '';
+    const body: Record<string, unknown> = {
+      name: params.name,
+      ...(locationId && { locationId }),
+      ...(params.fields && { fields: params.fields }),
+      ...(params.thankYouMessage && { thankYouMessage: params.thankYouMessage }),
+    };
+    return (this.apiClient as any).makeRequest('POST', '/surveys/', body);
+  }
+
+  private async getSurveyById(params: any): Promise<any> {
+    const locationId = params.locationId || (this.apiClient as any).getConfig?.()?.locationId || '';
+    const qs = locationId ? `?locationId=${encodeURIComponent(locationId)}` : '';
+    return (this.apiClient as any).makeRequest('GET', `/surveys/${params.surveyId}${qs}`);
+  }
+
+  private async updateSurvey(params: any): Promise<any> {
+    const body: Record<string, unknown> = {};
+    if (params.name !== undefined) body.name = params.name;
+    if (params.fields !== undefined) body.fields = params.fields;
+    if (params.thankYouMessage !== undefined) body.thankYouMessage = params.thankYouMessage;
+    return (this.apiClient as any).makeRequest('PUT', `/surveys/${params.surveyId}`, body);
+  }
+
+  private async deleteSurvey(params: any): Promise<any> {
+    const locationId = params.locationId || (this.apiClient as any).getConfig?.()?.locationId || '';
+    const qs = locationId ? `?locationId=${encodeURIComponent(locationId)}` : '';
+    return (this.apiClient as any).makeRequest('DELETE', `/surveys/${params.surveyId}${qs}`);
+  }
+
+  private async listSurveySubmissions(params: any): Promise<any> {
+    const locationId = params.locationId || (this.apiClient as any).getConfig?.()?.locationId || '';
+    const qp = new URLSearchParams();
+    if (locationId) qp.append('locationId', locationId);
+    if (params.page) qp.append('page', String(params.page));
+    if (params.limit) qp.append('limit', String(params.limit));
+    if (params.startAt) qp.append('startAt', params.startAt);
+    if (params.endAt) qp.append('endAt', params.endAt);
+    const qs = qp.toString();
+    return (this.apiClient as any).makeRequest('GET', `/surveys/${params.surveyId}/submissions${qs ? `?${qs}` : ''}`);
+  }
+
+  private async getSurveySubmission(params: any): Promise<any> {
+    const locationId = params.locationId || (this.apiClient as any).getConfig?.()?.locationId || '';
+    const qs = locationId ? `?locationId=${encodeURIComponent(locationId)}` : '';
+    return (this.apiClient as any).makeRequest('GET', `/surveys/${params.surveyId}/submissions/${params.submissionId}${qs}`);
+  }
+
+  private async getSurveyStats(params: any): Promise<any> {
+    const locationId = params.locationId || (this.apiClient as any).getConfig?.()?.locationId || '';
+    const qp = new URLSearchParams();
+    if (locationId) qp.append('locationId', locationId);
+    if (params.startDate) qp.append('startDate', params.startDate);
+    if (params.endDate) qp.append('endDate', params.endDate);
+    const qs = qp.toString();
+    return (this.apiClient as any).makeRequest('GET', `/surveys/${params.surveyId}/stats${qs ? `?${qs}` : ''}`);
+  }
 }
 
 // Helper function to check if a tool name belongs to survey tools
 export function isSurveyTool(toolName: string): boolean {
   const surveyToolNames = [
     'ghl_get_surveys',
-    'ghl_get_survey_submissions'
+    'ghl_get_survey_submissions',
+    'ghl_create_survey',
+    'ghl_get_survey',
+    'ghl_update_survey',
+    'ghl_delete_survey',
+    'ghl_list_survey_submissions',
+    'ghl_get_survey_submission',
+    'ghl_get_survey_stats',
   ];
   
   return surveyToolNames.includes(toolName);

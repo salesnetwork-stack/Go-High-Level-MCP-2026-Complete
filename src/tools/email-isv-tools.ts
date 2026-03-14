@@ -1,6 +1,7 @@
 /**
- * GoHighLevel Email ISV (Verification) Tools
- * Implements email verification functionality for the MCP server
+ * GoHighLevel Email ISV Tools
+ * Implements email verification + sending domain management + deliverability
+ * functionality for the MCP server.
  */
 
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
@@ -12,7 +13,7 @@ import {
 
 /**
  * Email ISV Tools class
- * Provides email verification capabilities
+ * Provides email verification and sending domain management capabilities
  */
 export class EmailISVTools {
   constructor(private ghlClient: GHLApiClient) {}
@@ -51,6 +52,177 @@ export class EmailISVTools {
             complexity: "simple"
           }
         }
+      },
+
+      // ─── Sending Domain Management ─────────────────────────────────────────
+      {
+        name: 'ghl_list_email_domains',
+        description: 'List all connected email sending domains for a location. Shows verification status, DKIM/SPF/DMARC configuration, and default domain.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID to list domains for (uses default if not provided)'
+            }
+          }
+        },
+        _meta: {
+          labels: { category: 'email-isv', access: 'read', complexity: 'simple' }
+        }
+      },
+      {
+        name: 'ghl_add_email_domain',
+        description: 'Add a new sending domain to a location. After adding, DNS records must be configured and the domain verified.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID to add the domain to (uses default if not provided)'
+            },
+            domain: {
+              type: 'string',
+              description: 'The domain name to add (e.g., "mail.example.com")'
+            }
+          },
+          required: ['domain']
+        },
+        _meta: {
+          labels: { category: 'email-isv', access: 'write', complexity: 'simple' }
+        }
+      },
+      {
+        name: 'ghl_verify_email_domain',
+        description: 'Trigger DNS verification check for an email sending domain. Returns whether DKIM, SPF, and DMARC records are correctly configured.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID (uses default if not provided)'
+            },
+            domainId: {
+              type: 'string',
+              description: 'The ID of the domain to verify'
+            }
+          },
+          required: ['domainId']
+        },
+        _meta: {
+          labels: { category: 'email-isv', access: 'write', complexity: 'simple' }
+        }
+      },
+      {
+        name: 'ghl_delete_email_domain',
+        description: 'Remove a sending domain from a location. Emails using this domain will no longer be sent after removal.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID (uses default if not provided)'
+            },
+            domainId: {
+              type: 'string',
+              description: 'The ID of the domain to remove'
+            }
+          },
+          required: ['domainId']
+        },
+        _meta: {
+          labels: { category: 'email-isv', access: 'delete', complexity: 'simple' }
+        }
+      },
+      {
+        name: 'ghl_get_domain_dns_records',
+        description: 'Get the required DNS records (DKIM, SPF, DMARC) for a sending domain. Returns records you need to add to your DNS provider.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID (uses default if not provided)'
+            },
+            domainId: {
+              type: 'string',
+              description: 'The ID of the domain to get DNS records for'
+            }
+          },
+          required: ['domainId']
+        },
+        _meta: {
+          labels: { category: 'email-isv', access: 'read', complexity: 'simple' }
+        }
+      },
+
+      // ─── Deliverability & Stats ──────────────────────────────────────────
+      {
+        name: 'ghl_get_email_stats',
+        description: 'Get email deliverability statistics for a location including sent, delivered, bounced, spam complaints, and open/click rates.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID to get stats for (uses default if not provided)'
+            },
+            domainId: {
+              type: 'string',
+              description: 'Filter stats by specific sending domain'
+            },
+            startDate: {
+              type: 'string',
+              description: 'Start date for stats period (YYYY-MM-DD format)'
+            },
+            endDate: {
+              type: 'string',
+              description: 'End date for stats period (YYYY-MM-DD format)'
+            }
+          }
+        },
+        _meta: {
+          labels: { category: 'email-isv', access: 'read', complexity: 'simple' }
+        }
+      },
+
+      // ─── Provider Management ─────────────────────────────────────────────
+      {
+        name: 'ghl_list_email_providers',
+        description: 'List all ISV (integrated service vendor) email providers connected to a location (e.g., Mailgun, SendGrid, Postmark).',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID to list providers for (uses default if not provided)'
+            }
+          }
+        },
+        _meta: {
+          labels: { category: 'email-isv', access: 'read', complexity: 'simple' }
+        }
+      },
+      {
+        name: 'ghl_set_default_email_provider',
+        description: 'Set the default email provider for a location. All outbound emails will use this provider unless overridden.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            locationId: {
+              type: 'string',
+              description: 'Location ID (uses default if not provided)'
+            },
+            providerId: {
+              type: 'string',
+              description: 'The ID of the email provider to set as default'
+            }
+          },
+          required: ['providerId']
+        },
+        _meta: {
+          labels: { category: 'email-isv', access: 'write', complexity: 'simple' }
+        }
       }
     ];
   }
@@ -62,6 +234,62 @@ export class EmailISVTools {
     switch (name) {
       case 'verify_email':
         return await this.verifyEmail(args as MCPVerifyEmailParams);
+
+      // ─── Domain Management ──────────────────────────────────────────────
+      case 'ghl_list_email_domains': {
+        const locationId = args.locationId || this.ghlClient.getConfig().locationId;
+        const params = new URLSearchParams();
+        if (locationId) params.append('locationId', locationId);
+        const qs = params.toString();
+        return this.ghlClient.makeRequest('GET', `/email-isv/domains${qs ? `?${qs}` : ''}`);
+      }
+
+      case 'ghl_add_email_domain': {
+        const locationId = args.locationId || this.ghlClient.getConfig().locationId;
+        const body: Record<string, unknown> = { domain: args.domain };
+        if (locationId) body.locationId = locationId;
+        return this.ghlClient.makeRequest('POST', '/email-isv/domains', body);
+      }
+
+      case 'ghl_verify_email_domain': {
+        return this.ghlClient.makeRequest('POST', `/email-isv/domains/${args.domainId}/verify`);
+      }
+
+      case 'ghl_delete_email_domain': {
+        return this.ghlClient.makeRequest('DELETE', `/email-isv/domains/${args.domainId}`);
+      }
+
+      case 'ghl_get_domain_dns_records': {
+        return this.ghlClient.makeRequest('GET', `/email-isv/domains/${args.domainId}/dns-records`);
+      }
+
+      // ─── Stats ──────────────────────────────────────────────────────────
+      case 'ghl_get_email_stats': {
+        const locationId = args.locationId || this.ghlClient.getConfig().locationId;
+        const params = new URLSearchParams();
+        if (locationId) params.append('locationId', locationId);
+        if (args.domainId) params.append('domainId', String(args.domainId));
+        if (args.startDate) params.append('startDate', String(args.startDate));
+        if (args.endDate) params.append('endDate', String(args.endDate));
+        const qs = params.toString();
+        return this.ghlClient.makeRequest('GET', `/email-isv/stats${qs ? `?${qs}` : ''}`);
+      }
+
+      // ─── Providers ──────────────────────────────────────────────────────
+      case 'ghl_list_email_providers': {
+        const locationId = args.locationId || this.ghlClient.getConfig().locationId;
+        const params = new URLSearchParams();
+        if (locationId) params.append('locationId', locationId);
+        const qs = params.toString();
+        return this.ghlClient.makeRequest('GET', `/email-isv/providers${qs ? `?${qs}` : ''}`);
+      }
+
+      case 'ghl_set_default_email_provider': {
+        const locationId = args.locationId || this.ghlClient.getConfig().locationId;
+        const body: Record<string, unknown> = { providerId: args.providerId };
+        if (locationId) body.locationId = locationId;
+        return this.ghlClient.makeRequest('PATCH', '/email-isv/providers/default', body);
+      }
 
       default:
         throw new Error(`Unknown email ISV tool: ${name}`);
